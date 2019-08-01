@@ -9,6 +9,7 @@
 #include "glm/geometric.hpp"
 #include <vector>
 #include <iostream>
+#include <cassert>
 
 //data structure to represent 3d point
 using Point = glm::vec3;
@@ -33,6 +34,17 @@ public:
     Point getPoint() const {return point_;};
     double getValue() const {return value_;};
 
+    //return the point of different point in a voxel
+    Point getPoint(unsigned int n){
+        assert(n <8);
+        int i,j,k;
+        k = n%2;
+        n >>= 1;
+        j = n%2;
+        n >>= 1;
+        i = n;
+        return Point(i,j,k);
+    }
 
 private:
     Point point_;
@@ -58,8 +70,13 @@ public:
     }
 
     //return the vertex at this index
-    Vertex operator()(int a, int b, int c) const{
+    Vertex get(int a, int b, int c) const{
         return vertex_[a*resY_*resZ_ + b*resZ_ + c];
+    }
+
+    //return the vertex at this point
+    Vertex operator()(const Point& point){
+        return this->get(point.x, point.y, point.z);
     }
 
 private:
@@ -85,13 +102,13 @@ public:
     MarchingCubes(int resolution=100, double isovalue = 0.5):
         //the number of vertices is 1 more than the resolution
         res_(resolution), isoLevel_(isovalue), vertices_(Vertices(res_+1, res_+1, res_+1)){
-        voxels_ = new Voxel[res_ * res_ * res_];
+        //voxels_ = new Voxel[res_ * res_ * res_];
         size_ = 1. / resolution;
         offset_ = 0;
     };
 
     ~MarchingCubes(){
-        delete[] voxels_;
+        //delete[] voxels_;
     }
 
     // process and store the input point cloud
@@ -102,6 +119,10 @@ public:
 
     // decide the value of each vertex using
     void constructGrid(const std::vector<Point>& points);
+
+    void generateMesh();
+
+    Point VertexInterp(const Vertex& v1, const Vertex& v2);
 
     // get the value of the n-th index vertex of the grid
     // whose most significant vertex is the parameter vertex
@@ -115,7 +136,7 @@ private:
     double offset_;
     Vertices vertices_ ;
     // the index of the voxel is marked by its nearest vertice towards (0,0,0)
-    Voxel* voxels_;
+    //Voxel* voxels_;
 
     int edgeTable[256]={
             0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,

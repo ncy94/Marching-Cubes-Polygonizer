@@ -41,7 +41,6 @@ void MarchingCubes::constructGrid(const std::vector<Point>& points)
                 for(int k = floor(z); k< ceil(z); ++k){
                     if(glm::distance(Point(i,j,k),point) < isoLevel_) {
                         vertices_(i, j, k, 1);
-                        voxels_(i,j,k) =1;
                     }
 
                 }
@@ -49,34 +48,108 @@ void MarchingCubes::constructGrid(const std::vector<Point>& points)
         }
     }
 
-    // no need
+}
 
-//    for(int i=0; i<res_; ++i){
-//        for(int j=0; j<res_; ++j){
-//            for(int k=0; k<res_; ++k){
-//                (voxels_)[i * res_*res_ + j*res_ + k] = vertices_(i,j,k);
-//            }
-//        }
-//    }
+Point MarchingCubes::VertexInterp(const Vertex &v1, const Vertex &v2) {
+    if(abs(isoLevel_ - v1.getValue()) < 0.00001)
+        return v1.getPoint();
+
+    if(abs(isoLevel_ - v2.getValue()) < 0.00001)
+        return v2.getPoint();
+
+    if(abs(v1.getValue() - v2.getValue()) < 0.00001)
+        return v1.getPoint();
+
+    float tmp;
+    Point p;
+
+    tmp = (isoLevel_ - v1.getValue())/(v2.getValue() - v1.getValue());
+    p = v1.getPoint() + tmp * (v2.getPoint() - v1.getPoint());
+
+    return p;
+}
+
+void MarchingCubes::generateMesh() {
+    //iterator each voxel
+    for(int i=0; i<res_; ++i)
+        for(int j=0; j<res_; ++j)
+            for(int k=0; k<res_; ++k){
+                unsigned int cubeindex = 0;
+                Vertex voxelPivot = vertices_.get(i,j,k);
+                Point vertList[12];
+
+                //determine the index of edgeTable for each voxel
+                for(unsigned int i=0; i<8; ++i){
+                    if(vertices_(voxelPivot.getPoint(i)).getValue() < isoLevel_)
+                        cubeindex |= 1 >> i;
+                }
+
+                if(edgeTable[cubeindex] & 1)
+                    vertList[0] = VertexInterp(voxelPivot, vertices_(voxelPivot.getPoint(1)));
+
+                if(edgeTable[cubeindex] & 2)
+                    vertList[1] = VertexInterp(vertices_(voxelPivot.getPoint(1)),
+                            vertices_(voxelPivot.getPoint(2)));
+
+                if(edgeTable[cubeindex] & 4)
+                    vertList[2] = VertexInterp(vertices_(voxelPivot.getPoint(2)),
+                            vertices_(voxelPivot.getPoint(3)));
+
+                if(edgeTable[cubeindex] & 8)
+                    vertList[3] = VertexInterp(vertices_(voxelPivot.getPoint(3)),voxelPivot);
+
+                if(edgeTable[cubeindex] & 16)
+                    vertList[4] = VertexInterp(vertices_(voxelPivot.getPoint(4)),
+                            vertices_(voxelPivot.getPoint(5)));
+
+                if(edgeTable[cubeindex] & 32)
+                    vertList[5] = VertexInterp(vertices_(voxelPivot.getPoint(5)),
+                            vertices_(voxelPivot.getPoint(6)));
+
+                if(edgeTable[cubeindex] & 64)
+                    vertList[6] = VertexInterp(vertices_(voxelPivot.getPoint(6)),
+                            vertices_(voxelPivot.getPoint(7)));
+
+                if(edgeTable[cubeindex] & 128)
+                    vertList[7] = VertexInterp(vertices_(voxelPivot.getPoint(7)),
+                            vertices_(voxelPivot.getPoint(4)));
+
+                if(edgeTable[cubeindex] & 256)
+                    vertList[8] = VertexInterp(vertices_(voxelPivot.getPoint(0)),
+                            vertices_(voxelPivot.getPoint(4)));
+
+                if(edgeTable[cubeindex] & 512)
+                    vertList[9] = VertexInterp(vertices_(voxelPivot.getPoint(1)),
+                            vertices_(voxelPivot.getPoint(5)));
+
+                if(edgeTable[cubeindex] & 1024)
+                    vertList[10] = VertexInterp(vertices_(voxelPivot.getPoint(2)),
+                            vertices_(voxelPivot.getPoint(6)));
+
+                if(edgeTable[cubeindex] & 2048)
+                    vertList[11] = VertexInterp(vertices_(voxelPivot.getPoint(3)),
+                                               vertices_(voxelPivot.getPoint(7)));
+
+            }
 
 }
 
 // This function returns the vertex value (1 or 0) of a grid voxel
 // given the least significant vertex and the index of vertex
-double MarchingCubes::getGridValue(unsigned int n, const Vertices &vertex)
-{
-    assert(n < 8);
-
-    // the coordinate of the vertex is the binary representation of n
-    // where i,j,k are the binary bits
-    int i,j,k = 0;
-    k = n % 2;
-    n >>= 1;
-    j = n % 2;
-    n >>= 1;
-    i = n;
-
-    return vertex(i,j,k);
-
-}
+//double MarchingCubes::getGridValue(unsigned int n, const Vertices &vertex)
+//{
+//    assert(n < 8);
+//
+//    // the coordinate of the vertex is the binary representation of n
+//    // where i,j,k are the binary bits
+//    int i,j,k = 0;
+//    k = n % 2;
+//    n >>= 1;
+//    j = n % 2;
+//    n >>= 1;
+//    i = n;
+//
+//    return vertex(i,j,k);
+//
+//}
 

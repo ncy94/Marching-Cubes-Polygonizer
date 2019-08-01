@@ -39,17 +39,22 @@ void MarchingCubes::constructGrid(const std::vector<Point>& points)
         for(int i = floor(x); i< ceil(x); ++i){
             for(int j = floor(y) ; j< ceil(y); ++j){
                 for(int k = floor(z); k< ceil(z); ++k){
-                    if(glm::distance(Point(i,j,k),point) < isoLevel_)
-                        vertices_(i,j,k,1);
+                    if(glm::distance(Point(i,j,k),point) < isoLevel_) {
+                        vertices_(i, j, k, 1);
+                        voxels_(i,j,k) =1;
+                    }
+
                 }
             }
         }
     }
 
+    // no need
+
 //    for(int i=0; i<res_; ++i){
 //        for(int j=0; j<res_; ++j){
 //            for(int k=0; k<res_; ++k){
-//                (*voxels_)[i * res_*res_ + j*res_ + k] = vertices_(i,j,k);
+//                (voxels_)[i * res_*res_ + j*res_ + k] = vertices_(i,j,k);
 //            }
 //        }
 //    }

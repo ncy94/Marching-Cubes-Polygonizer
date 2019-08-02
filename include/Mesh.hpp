@@ -5,51 +5,66 @@
 #ifndef CPP_PROJECT_MESH_HPP
 #define CPP_PROJECT_MESH_HPP
 
-#include "MarchingCubes.hpp"
 #include <vector>
 #include <iostream>
 #include <cassert>
 #include <ostream>
+#include <iostream>
+#include <array>
+#include "glm/vec3.hpp"
+
+using Point = glm::vec3;
+
+struct Face{
+    Face(Point a, Point b, Point c){
+        vertex_[0] = a;
+        vertex_[1] = b;
+        vertex_[2] = c;
+    }
+    Point vertex_[3];
+};
 
 
 class Mesh{
 public:
-    Mesh() = default;
-
-    void addFace(Face face){
-        faces_.push_back(face);
-
-        //add the 3 vertices of a face
-        for(int i=0; i<3; ++i){
-            //new vertex will be added at index vertices_size()
-            faces_index.push_back(vertices_.size());
-            vertices_.push_back(face.vertex_[i]);
-        }
+    void addPoint(const Point& point){
+        point_.push_back(point);
     }
 
-    //output the mesh as obj format
-    friend ostream& operator<<(ostream& out, const Mesh& mesh){
-        if(mesh.faces_index.size() == 0){
-            assert(mesh.faces_.size() == 0);
-            return;
+    void addFace(int i){
+        std::array<int,3> tmp({i,i+1,i+2});
+        faces_.push_back(tmp);
+    }
+
+    int getSize() const{ return point_.size();}
+
+
+    //output the mesh as OFF format
+    friend std::ostream& operator<<(std::ostream& out, const Mesh& mesh){
+        if(mesh.faces_.empty()){
+            return out;
         }
 
+        out << "OFF \n" << mesh.point_.size() << ' ' << mesh.faces_.size() << " 0\n";
+
         //output the vertices
-        while(mesh.vertices_.size() > 0){
-            out << 'v ' << mesh.vertices_[0] << ' ' << mesh.vertices_[1] << ' ' << mesh.vertices_[2] << '\n';
+        for(auto& point: mesh.point_){
+            out << "v " << point.x << ' ' << point.y << ' ' << point.z << '\n';
         }
 
         //output the face indices
-        while(mesh.vertices_ > 0){
-            out << 'f ' << mesh.faces_index[0] << ' '<< mesh.faces_index[1] <<' '<<mesh.faces_index[2] <<'\n';
+        for(auto& face: mesh.faces_){
+            out << "f " << face[0] << ' '<< face[1] <<' '<< face[2] <<'\n';
         }
+
+        return out;
     }
 
 
 private:
-    std::vector<Point> vertices_; // stores the vertices
-    std::vector<Face> faces_; // stores the faces
-    std::vector<int> faces_index; // stores the vertex indices of the faces.
+    std::vector<Point> point_; // stores the vertices
+    std::vector<std::array<int,3>> faces_; // stores the faces
+
 
 
 };

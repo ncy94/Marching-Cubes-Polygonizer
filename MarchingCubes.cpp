@@ -10,12 +10,13 @@ std::vector<Point> MarchingCubes::ProcessPoints(std::istream & in)
     {
         double x,y,z;
         if(!(in >> x >> y >> z)){
-            throw std::runtime_error("point not valid");
+            break;
+            //throw std::runtime_error("point not valid");
         }
-        max = std::max(x,y,z);
-        min = std::min(x,y,z);
+        max = std::max({x,y,z});
+        min = std::min({x,y,z});
 
-        Points.emplace_back(Points);
+        Points.emplace_back(Point(x,y,z));
 
     }
 
@@ -23,6 +24,8 @@ std::vector<Point> MarchingCubes::ProcessPoints(std::istream & in)
     //and then align to the grid of the specific resolution
     size_ = (max - min)/res_;
     offset_ = min;
+
+    return Points;
 
 }
 
@@ -70,6 +73,8 @@ Point MarchingCubes::VertexInterp(const Vertex &v1, const Vertex &v2) {
 }
 
 void MarchingCubes::generateMesh() {
+    int faceindex = 0;
+
     //iterator each voxel
     for(int i=0; i<res_; ++i)
         for(int j=0; j<res_; ++j)
@@ -79,8 +84,8 @@ void MarchingCubes::generateMesh() {
                 Point vertList[12];
 
                 //determine the index of edgeTable for each voxel
-                for(unsigned int i=0; i<8; ++i){
-                    if(vertices_(voxelPivot.getPoint(i)).getValue() < isoLevel_)
+                for(unsigned int m=0; m<8; ++m){
+                    if(vertices_(voxelPivot.getPoint(m)).getValue() < isoLevel_)
                         cubeindex |= 1 >> i;
                 }
 
@@ -130,7 +135,21 @@ void MarchingCubes::generateMesh() {
                     vertList[11] = VertexInterp(vertices_(voxelPivot.getPoint(3)),
                                                vertices_(voxelPivot.getPoint(7)));
 
+                //get the triangle from the vertList
+                int trinum = 0;
+                for(int n=0; triTable[cubeindex][n] != -1; n+=3 ){
+                    // add the three points in the mesh
+                    mesh_.addPoint(vertList[triTable[cubeindex][n]]);
+                    mesh_.addPoint(vertList[triTable[cubeindex][n+1]]);
+                    mesh_.addPoint(vertList[triTable[cubeindex][n+3]]);
+
+                    // add the triangle index in the mesh.
+                    mesh_.addFace(faceindex);
+                    faceindex += 3;
+                }
+
             }
+
 
 }
 

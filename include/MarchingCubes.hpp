@@ -7,6 +7,7 @@
 
 #include "glm/vec3.hpp"
 #include "glm/geometric.hpp"
+#include "Mesh.hpp"
 #include <vector>
 #include <iostream>
 #include <cassert>
@@ -14,14 +15,7 @@
 //data structure to represent 3d point
 using Point = glm::vec3;
 
-struct Face{
-    Face(Point a, Point b, Point c){
-        vertex_[0] = a;
-        vertex_[1] = b;
-        vertex_[2] = c;
-    }
-    Point vertex_[3];
-};
+
 
 class Vertex{
 public:
@@ -122,6 +116,8 @@ public:
 
     void generateMesh();
 
+    Mesh& getMesh() {return mesh_;}
+
     Point VertexInterp(const Vertex& v1, const Vertex& v2);
 
     // get the value of the n-th index vertex of the grid
@@ -135,6 +131,7 @@ private:
     double size_; // the size of each voxel
     double offset_;
     Vertices vertices_ ;
+    Mesh mesh_;
     // the index of the voxel is marked by its nearest vertice towards (0,0,0)
     //Voxel* voxels_;
 

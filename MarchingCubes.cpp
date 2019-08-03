@@ -1,8 +1,40 @@
 #include <cmath>
+#include <random>
 #include "MarchingCubes.hpp"
 
+std::vector<Point> MarchingCubes::genrateRandomPoints(int number) {
+    std::vector<Point> res;
+    std::default_random_engine e;
+    std::uniform_real_distribution<double> z(50,60),x(50,60),y(50,60);
 
-std::vector<Point> MarchingCubes::ProcessPoints(std::istream & in)
+
+    for(int i=0; i<number; ++i) {
+        double t1 = x(e), t2 = y(e), t3 = z(e);
+        res.emplace_back(Point(t1,t2,t3));
+    }
+
+    return res;
+
+}
+
+std::vector<Point> MarchingCubes::generateSphere(int radius, int number) {
+    std::vector<Point> res;
+    int a=0, b=0, iter = number;
+    for(int a=0; a <iter; ++a)
+        for(int b=0; b<iter; ++b) {
+            double alpha = (double)a/iter * 2. * 3.14159;
+            double beta = (double)b/iter * 2. * 3.14159;
+            double z = radius * sin(alpha) + radius;
+            double y = radius * cos(alpha) * sin(beta) + radius;
+            double x = radius * cos(alpha) * cos(beta) + radius;
+            res.emplace_back(Point(x,y,z));
+        }
+
+    return res;
+}
+
+
+std::vector<Point> MarchingCubes::processPoints(std::istream &in)
 {
     std::vector<Point> Points;
     double max = 0, min = 0; //record the largest value

@@ -93,7 +93,7 @@ private:
 class MarchingCubes{
 public:
     //default resolution: 100*100*100, default isovalue is 0.5
-    explicit MarchingCubes(int resolution=100, double isovalue = 0.5):
+    explicit MarchingCubes(int resolution=100, double isovalue = 1):
         //the number of vertices is 1 more than the resolution
         res_(resolution), isoLevel_(isovalue), vertices_(Vertices(res_+1, res_+1, res_+1)){
         //voxels_ = new Voxel[res_ * res_ * res_];
@@ -106,10 +106,11 @@ public:
     }
 
     // process and store the input point cloud
-    std::vector<Point> ProcessPoints(std::istream&);
+    std::vector<Point> processPoints(std::istream &in);
 
     // random generate a set of points to represent the object
     std::vector<Point> genrateRandomPoints(int number);
+    std::vector<Point> generateSphere(int radius, int number);
 
     // decide the value of each vertex using
     void constructGrid(const std::vector<Point>& points);

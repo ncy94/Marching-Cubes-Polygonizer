@@ -49,12 +49,12 @@ public:
 
         //output the vertices
         for(auto& point: mesh.point_){
-            out << "v " << point.x << ' ' << point.y << ' ' << point.z << '\n';
+            out << point.x << ' ' << point.y << ' ' << point.z << '\n';
         }
 
         //output the face indices
         for(auto& face: mesh.faces_){
-            out << "f " << face[0] << ' '<< face[1] <<' '<< face[2] <<'\n';
+            out << "3 " << face[0] << ' '<< face[1] <<' '<< face[2] <<'\n';
         }
 
         return out;

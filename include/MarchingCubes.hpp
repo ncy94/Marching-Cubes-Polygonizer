@@ -37,7 +37,7 @@ public:
         j = n%2;
         n >>= 1;
         i = n;
-        return Point(i,j,k);
+        return Point(point_.x+i,point_.y+j,point_.z+k);
     }
 
 private:
@@ -93,7 +93,7 @@ private:
 class MarchingCubes{
 public:
     //default resolution: 100*100*100, default isovalue is 0.5
-    MarchingCubes(int resolution=100, double isovalue = 0.5):
+    explicit MarchingCubes(int resolution=100, double isovalue = 0.5):
         //the number of vertices is 1 more than the resolution
         res_(resolution), isoLevel_(isovalue), vertices_(Vertices(res_+1, res_+1, res_+1)){
         //voxels_ = new Voxel[res_ * res_ * res_];
@@ -122,7 +122,7 @@ public:
 
     // get the value of the n-th index vertex of the grid
     // whose most significant vertex is the parameter vertex
-    double getGridValue(unsigned int n, const Vertices& vertex);
+    //double getGridValue(unsigned int n, const Vertices& vertex);
 
 
 private:

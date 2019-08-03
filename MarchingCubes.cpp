@@ -33,15 +33,15 @@ void MarchingCubes::constructGrid(const std::vector<Point>& points)
 {
     // align the point to the grid starting from (0,0,0) with the resolution
     for(auto point: points){
-        double x = (point.x - offset_) / size_;
-        double y = (point.y - offset_) / size_;
-        double z = (point.z - offset_) / size_;
+        double x = (point.x - offset_);// / size_;
+        double y = (point.y - offset_);// / size_;
+        double z = (point.z - offset_);// / size_;
 
         //find the neighbor gird voxel of the point. For each vertice
         //if it's within isolevel, set the vertice to value 1
-        for(int i = floor(x); i< ceil(x); ++i){
-            for(int j = floor(y) ; j< ceil(y); ++j){
-                for(int k = floor(z); k< ceil(z); ++k){
+        for(int i = floor(x); i<= ceil(x); ++i){
+            for(int j = floor(y) ; j<= ceil(y); ++j){
+                for(int k = floor(z); k<= ceil(z); ++k){
                     if(glm::distance(Point(i,j,k),point) < isoLevel_) {
                         vertices_(i, j, k, 1);
                     }
@@ -86,8 +86,10 @@ void MarchingCubes::generateMesh() {
                 //determine the index of edgeTable for each voxel
                 for(unsigned int m=0; m<8; ++m){
                     if(vertices_(voxelPivot.getPoint(m)).getValue() < isoLevel_)
-                        cubeindex |= 1 >> i;
+                        cubeindex |= (1 << m);
                 }
+                if(edgeTable[cubeindex] == 0)
+                    continue;
 
                 if(edgeTable[cubeindex] & 1)
                     vertList[0] = VertexInterp(voxelPivot, vertices_(voxelPivot.getPoint(1)));
@@ -141,7 +143,7 @@ void MarchingCubes::generateMesh() {
                     // add the three points in the mesh
                     mesh_.addPoint(vertList[triTable[cubeindex][n]]);
                     mesh_.addPoint(vertList[triTable[cubeindex][n+1]]);
-                    mesh_.addPoint(vertList[triTable[cubeindex][n+3]]);
+                    mesh_.addPoint(vertList[triTable[cubeindex][n+2]]);
 
                     // add the triangle index in the mesh.
                     mesh_.addFace(faceindex);

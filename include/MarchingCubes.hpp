@@ -109,8 +109,8 @@ public:
     std::vector<Point> processPoints(std::istream &in);
 
     // random generate a set of points to represent the object
-    std::vector<Point> genrateRandomPoints(int number);
-    std::vector<Point> generateSphere(int radius, int number);
+    static std::vector<Point> generateRandomPoints(int number);
+    static std::vector<Point> generateSphere(int radius, int number);
 
     // decide the value of each vertex using
     void constructGrid(const std::vector<Point>& points);
@@ -133,8 +133,6 @@ private:
     float offset_;
     Vertices vertices_ ;
     Mesh mesh_;
-    // the index of the voxel is marked by its nearest vertice towards (0,0,0)
-    //Voxel* voxels_;
 
     int edgeTable[256]={
             0x0  , 0x109, 0x203, 0x30a, 0x406, 0x50f, 0x605, 0x70c,

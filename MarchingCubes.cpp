@@ -2,7 +2,7 @@
 #include <random>
 #include "MarchingCubes.hpp"
 
-std::vector<Point> MarchingCubes::genrateRandomPoints(int number) {
+std::vector<Point> MarchingCubes::generateRandomPoints(int number) {
     std::vector<Point> res;
     std::default_random_engine e;
     std::uniform_real_distribution<float> z(50,60),x(50,60),y(50,60);
@@ -19,13 +19,13 @@ std::vector<Point> MarchingCubes::genrateRandomPoints(int number) {
 
 std::vector<Point> MarchingCubes::generateSphere(int radius, int number) {
     std::vector<Point> res;
-    int a=0, b=0, iter = number;
+    int iter = number;
 
     //use polar coordinate to generate the sphere
     for(int a=0; a <iter; ++a)
         for(int b=0; b<iter; ++b) {
-            float alpha = (float)a/iter * 2. * 3.14159;
-            float beta = (float)b/iter * 2. * 3.14159;
+            float alpha = (float)a/iter * 2. * 3.1415926;
+            float beta = (float)b/iter * 2. * 3.1415926;
             float z = radius * sin(alpha) + radius;
             float y = radius * cos(alpha) * sin(beta) + radius;
             float x = radius * cos(alpha) * cos(beta) + radius;
@@ -70,6 +70,8 @@ std::vector<Point> MarchingCubes::processPoints(std::istream &in)
 
 void MarchingCubes::constructGrid(const std::vector<Point>& points)
 {
+    int isoScale = res_/100 * isoLevel_;
+
     // align the point to the grid starting from (0,0,0) with the resolution
     for(auto point: points){
         float x = (point.x - offset_) / size_;
@@ -79,13 +81,16 @@ void MarchingCubes::constructGrid(const std::vector<Point>& points)
 
         //find the neighbor gird voxel of the point. For each vertex
         //the value varies (0,1), equals 1 when it's just the vertex
-        for(int i = floor(x); i<= ceil(x); ++i){
-            for(int j = floor(y) ; j<= ceil(y); ++j){
-                for(int k = floor(z); k<= ceil(z); ++k){
+        for(int i = floor(x)-isoScale; i<= ceil(x)+isoScale; ++i){
+            for(int j = floor(y)-isoScale ; j<= ceil(y)+isoScale; ++j){
+                for(int k = floor(z)-isoScale; k<= ceil(z)+isoScale; ++k){
+                    if(i<0 || j<0 || k<0 || i>res_ || j>res_ || k>res_)
+                        continue;
                     float distance = glm::distance(Point(i,j,k),Point(x,y,z));
+                    //std::cout << distance <<'\n';
 
-                    if(distance < isoLevel_) {
-                        vertices_(i, j, k, 1 - distance/1);
+                    if(distance <= isoScale) {
+                        vertices_(i, j, k, 1);
                     }
 
                 }
@@ -187,13 +192,17 @@ void MarchingCubes::generateMesh() {
                 for(int n=0; triTable[cubeindex][n] != -1; n+=3 ){
 
                     // add the three points in the mesh
-                    int index1 = mesh_.addPoint(vertList[triTable[cubeindex][n]], faceindex, res_);
-                    int index2 = mesh_.addPoint(vertList[triTable[cubeindex][n+1]], faceindex, res_);
-                    int index3 = mesh_.addPoint(vertList[triTable[cubeindex][n+2]], faceindex, res_);
+                    int index1 = mesh_.addPoint(vertList[triTable[cubeindex][n]] * size_ + offset_, faceindex, res_);
+                    int index2 = mesh_.addPoint(vertList[triTable[cubeindex][n+1]]* size_ + offset_, faceindex, res_);
+                    int index3 = mesh_.addPoint(vertList[triTable[cubeindex][n+2]]* size_ + offset_, faceindex, res_);
+
+//                    int index1 = mesh_.addPoint(vertList[triTable[cubeindex][n]], faceindex);
+//                    int index2 = mesh_.addPoint(vertList[triTable[cubeindex][n+1]], faceindex);
+//                    int index3 = mesh_.addPoint(vertList[triTable[cubeindex][n+2]], faceindex);
 
                     // add the triangle index in the mesh.
                     mesh_.addFace(index1, index2, index3);
-                    //faceindex += 3;
+
                 }
 
             }
@@ -201,22 +210,4 @@ void MarchingCubes::generateMesh() {
 
 }
 
-// This function returns the vertex value (1 or 0) of a grid voxel
-// given the least significant vertex and the index of vertex
-//float MarchingCubes::getGridValue(unsigned int n, const Vertices &vertex)
-//{
-//    assert(n < 8);
-//
-//    // the coordinate of the vertex is the binary representation of n
-//    // where i,j,k are the binary bits
-//    int i,j,k = 0;
-//    k = n % 2;
-//    n >>= 1;
-//    j = n % 2;
-//    n >>= 1;
-//    i = n;
-//
-//    return vertex(i,j,k);
-//
-//}
 

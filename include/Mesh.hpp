@@ -44,6 +44,15 @@ public:
         return index_[hash];
     }
 
+    // directly add the point without checking the container
+    int addPoint(const Point& point, int& index){
+
+        point_.push_back(point);
+
+        return index++;
+
+    }
+
     void addFace(int i, int j, int k){
         std::array<int,3> tmp({i,j,k});
         faces_.push_back(tmp);

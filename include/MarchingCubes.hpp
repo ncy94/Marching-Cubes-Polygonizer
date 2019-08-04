@@ -21,12 +21,12 @@ class Vertex{
 public:
     Vertex() = default;
     Vertex(const Point& point): point_(point), value_(0){};
-    Vertex(const Point& point, double value): point_(point), value_(value){};
-    void setValue(double value){value_ = value;};
+    Vertex(const Point& point, float value): point_(point), value_(value){};
+    void setValue(float value){value_ = value;};
 
     //return the point and value of this vertex
     Point getPoint() const {return point_;};
-    double getValue() const {return value_;};
+    float getValue() const {return value_;};
 
     //return the point of different point in a voxel
     Point getPoint(unsigned int n){
@@ -42,7 +42,7 @@ public:
 
 private:
     Point point_;
-    double value_;
+    float value_;
 };
 
 
@@ -59,7 +59,7 @@ public:
     ~Vertices(){delete[] vertex_;}
 
     //assign val to index a,b,c
-    void operator()(int a, int b, int c, int val){
+    void operator()(int a, int b, int c, float val){
         vertex_[a*resY_*resZ_ + b*resZ_ + c].setValue(val);
     }
 
@@ -86,14 +86,14 @@ public:
 
 private:
     Point pivot_;
-    double val_;
+    float val_;
 
 };
 
 class MarchingCubes{
 public:
     //default resolution: 100*100*100, default isovalue is 0.5
-    explicit MarchingCubes(int resolution=100, double isovalue = 1):
+    explicit MarchingCubes(int resolution=100, float isovalue = 0.5):
         //the number of vertices is 1 more than the resolution
         res_(resolution), isoLevel_(isovalue), vertices_(Vertices(res_+1, res_+1, res_+1)){
         //voxels_ = new Voxel[res_ * res_ * res_];
@@ -123,14 +123,14 @@ public:
 
     // get the value of the n-th index vertex of the grid
     // whose most significant vertex is the parameter vertex
-    //double getGridValue(unsigned int n, const Vertices& vertex);
+    //float getGridValue(unsigned int n, const Vertices& vertex);
 
 
 private:
     int res_; //resolution of the object: res * res * res
-    double isoLevel_;
-    double size_; // the size of each voxel
-    double offset_;
+    float isoLevel_;
+    float size_; // the size of each voxel
+    float offset_;
     Vertices vertices_ ;
     Mesh mesh_;
     // the index of the voxel is marked by its nearest vertice towards (0,0,0)

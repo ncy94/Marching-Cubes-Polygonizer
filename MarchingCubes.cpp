@@ -5,11 +5,11 @@
 std::vector<Point> MarchingCubes::genrateRandomPoints(int number) {
     std::vector<Point> res;
     std::default_random_engine e;
-    std::uniform_real_distribution<double> z(50,60),x(50,60),y(50,60);
+    std::uniform_real_distribution<float> z(50,60),x(50,60),y(50,60);
 
 
     for(int i=0; i<number; ++i) {
-        double t1 = x(e), t2 = y(e), t3 = z(e);
+        float t1 = x(e), t2 = y(e), t3 = z(e);
         res.emplace_back(Point(t1,t2,t3));
     }
 
@@ -20,13 +20,15 @@ std::vector<Point> MarchingCubes::genrateRandomPoints(int number) {
 std::vector<Point> MarchingCubes::generateSphere(int radius, int number) {
     std::vector<Point> res;
     int a=0, b=0, iter = number;
+
+    //use polar coordinate to generate the sphere
     for(int a=0; a <iter; ++a)
         for(int b=0; b<iter; ++b) {
-            double alpha = (double)a/iter * 2. * 3.14159;
-            double beta = (double)b/iter * 2. * 3.14159;
-            double z = radius * sin(alpha) + radius;
-            double y = radius * cos(alpha) * sin(beta) + radius;
-            double x = radius * cos(alpha) * cos(beta) + radius;
+            float alpha = (float)a/iter * 2. * 3.14159;
+            float beta = (float)b/iter * 2. * 3.14159;
+            float z = radius * sin(alpha) + radius;
+            float y = radius * cos(alpha) * sin(beta) + radius;
+            float x = radius * cos(alpha) * cos(beta) + radius;
             res.emplace_back(Point(x,y,z));
         }
 
@@ -37,16 +39,21 @@ std::vector<Point> MarchingCubes::generateSphere(int radius, int number) {
 std::vector<Point> MarchingCubes::processPoints(std::istream &in)
 {
     std::vector<Point> Points;
-    double max = 0, min = 0; //record the largest value
+    float max = 0, min = 0; //record the largest value
     while(in)
     {
-        double x,y,z;
+
+        float x,y,z;
         if(!(in >> x >> y >> z)){
+
             break;
             //throw std::runtime_error("point not valid");
         }
-        max = std::max({x,y,z});
-        min = std::min({x,y,z});
+        auto max1 = std::max({x,y,z});
+        auto min1 = std::min({x,y,z});
+
+        max = max1 > max? max1 : max;
+        min = min1 < min? min1: min;
 
         Points.emplace_back(Point(x,y,z));
 
@@ -65,17 +72,20 @@ void MarchingCubes::constructGrid(const std::vector<Point>& points)
 {
     // align the point to the grid starting from (0,0,0) with the resolution
     for(auto point: points){
-        double x = (point.x - offset_);// / size_;
-        double y = (point.y - offset_);// / size_;
-        double z = (point.z - offset_);// / size_;
+        float x = (point.x - offset_) / size_;
+        float y = (point.y - offset_) / size_;
+        float z = (point.z - offset_) / size_;
+        //std::cout << x <<' '<< y <<' ' << z<< '\n';
 
-        //find the neighbor gird voxel of the point. For each vertice
-        //if it's within isolevel, set the vertice to value 1
+        //find the neighbor gird voxel of the point. For each vertex
+        //the value varies (0,1), equals 1 when it's just the vertex
         for(int i = floor(x); i<= ceil(x); ++i){
             for(int j = floor(y) ; j<= ceil(y); ++j){
                 for(int k = floor(z); k<= ceil(z); ++k){
-                    if(glm::distance(Point(i,j,k),point) < isoLevel_) {
-                        vertices_(i, j, k, 1);
+                    float distance = glm::distance(Point(i,j,k),Point(x,y,z));
+
+                    if(distance < isoLevel_) {
+                        vertices_(i, j, k, 1 - distance/1);
                     }
 
                 }
@@ -100,6 +110,9 @@ Point MarchingCubes::VertexInterp(const Vertex &v1, const Vertex &v2) {
 
     tmp = (isoLevel_ - v1.getValue())/(v2.getValue() - v1.getValue());
     p = v1.getPoint() + tmp * (v2.getPoint() - v1.getPoint());
+    
+    //the final point should be restored to the original scale
+    //p = p * size_ + offset_;
 
     return p;
 }
@@ -172,14 +185,15 @@ void MarchingCubes::generateMesh() {
                 //get the triangle from the vertList
                 int trinum = 0;
                 for(int n=0; triTable[cubeindex][n] != -1; n+=3 ){
+
                     // add the three points in the mesh
-                    mesh_.addPoint(vertList[triTable[cubeindex][n]]);
-                    mesh_.addPoint(vertList[triTable[cubeindex][n+1]]);
-                    mesh_.addPoint(vertList[triTable[cubeindex][n+2]]);
+                    int index1 = mesh_.addPoint(vertList[triTable[cubeindex][n]], faceindex, res_);
+                    int index2 = mesh_.addPoint(vertList[triTable[cubeindex][n+1]], faceindex, res_);
+                    int index3 = mesh_.addPoint(vertList[triTable[cubeindex][n+2]], faceindex, res_);
 
                     // add the triangle index in the mesh.
-                    mesh_.addFace(faceindex);
-                    faceindex += 3;
+                    mesh_.addFace(index1, index2, index3);
+                    //faceindex += 3;
                 }
 
             }
@@ -189,7 +203,7 @@ void MarchingCubes::generateMesh() {
 
 // This function returns the vertex value (1 or 0) of a grid voxel
 // given the least significant vertex and the index of vertex
-//double MarchingCubes::getGridValue(unsigned int n, const Vertices &vertex)
+//float MarchingCubes::getGridValue(unsigned int n, const Vertices &vertex)
 //{
 //    assert(n < 8);
 //

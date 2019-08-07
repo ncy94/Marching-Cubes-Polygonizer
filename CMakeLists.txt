@@ -5,9 +5,6 @@ project(cpp_project)
 set(CMAKE_CXX_STANDARD 17)
 
 find_library(GLM REQUIRED)
-if(NOT GLM_FOUND)
-    message(Error "GLM not found")
-endif()
 
 include_directories(PUBLIC include)
 
@@ -18,3 +15,8 @@ target_include_directories(generate_random_point_cloud PUBLIC ${GLM_INCLUDE_DIR}
 add_executable(generate_mesh main.cpp)
 target_link_libraries(generate_mesh ${GLM_LIBRAR_DIR})
 target_include_directories(generate_mesh PUBLIC ${GLM_INCLUDE_DIR})
+
+install(TARGETS generate_random_point_cloud generate_mesh DESTINATION bin)
+
+install(PROGRAMS demo DESTINATION bin)
+install(FILES testfile/bunny.xyz DESTINATION bin)

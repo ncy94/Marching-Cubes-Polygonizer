@@ -8,10 +8,10 @@ find_library(glm REQUIRED)
 
 include_directories(PUBLIC include)
 
-add_executable(generateRandomPoints generateRandomPoints.cpp)
-target_link_libraries(generateRandomPoints ${GLM_LIBRARIES})
-target_include_directories(generateRandomPoints PUBLIC ${GLM_INCLUDE_DIRECTORIES})
+add_executable(generate_random_point_cloud generateRandomPoints.cpp)
+target_link_libraries(generate_random_point_cloud ${GLM_LIBRARIES})
+target_include_directories(generate_random_point_cloud PUBLIC ${GLM_INCLUDE_DIRECTORIES})
 
-add_executable(mc main.cpp)
-target_link_libraries(mc ${GLM_LIBRARIES})
-target_include_directories(mc PUBLIC ${GLM_INCLUDE_DIRECTORIES})
+add_executable(generate_mesh main.cpp)
+target_link_libraries(generate_mesh ${GLM_LIBRARIES})
+target_include_directories(generate_mesh PUBLIC ${GLM_INCLUDE_DIRECTORIES})

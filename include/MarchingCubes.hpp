@@ -5,8 +5,8 @@
 #ifndef CPP_PROJECT_NCY94_MARCHINGCUBES_HPP
 #define CPP_PROJECT_NCY94_MARCHINGCUBES_HPP
 
-#include "glm/vec3.hpp"
-#include "glm/geometric.hpp"
+#include "../glm/glm/vec3.hpp"
+#include "../glm/glm/geometric.hpp"
 #include "Mesh.hpp"
 #include <vector>
 #include <iostream>
@@ -109,7 +109,6 @@ public:
     std::vector<Point> processPoints(std::istream &in);
 
     // random generate a set of points to represent the object
-    static std::vector<Point> generateRandomPoints(int number);
     static std::vector<Point> generateSphere(int radius, int number);
 
     // decide the value of each vertex using

@@ -1,21 +1,8 @@
 #include <cmath>
 #include <random>
+#include <algorithm>
 #include "MarchingCubes.hpp"
 
-std::vector<Point> MarchingCubes::generateRandomPoints(int number) {
-    std::vector<Point> res;
-    std::default_random_engine e;
-    std::uniform_real_distribution<float> z(50,60),x(50,60),y(50,60);
-
-
-    for(int i=0; i<number; ++i) {
-        float t1 = x(e), t2 = y(e), t3 = z(e);
-        res.emplace_back(Point(t1,t2,t3));
-    }
-
-    return res;
-
-}
 
 std::vector<Point> MarchingCubes::generateSphere(int radius, int number) {
     std::vector<Point> res;
@@ -91,6 +78,7 @@ void MarchingCubes::constructGrid(const std::vector<Point>& points)
 
                     if(distance <= isoScale) {
                         vertices_(i, j, k, 1);
+
                     }
 
                 }
@@ -192,13 +180,9 @@ void MarchingCubes::generateMesh() {
                 for(int n=0; triTable[cubeindex][n] != -1; n+=3 ){
 
                     // add the three points in the mesh
-                    int index1 = mesh_.addPoint(vertList[triTable[cubeindex][n]] * size_ + offset_, faceindex, res_);
-                    int index2 = mesh_.addPoint(vertList[triTable[cubeindex][n+1]]* size_ + offset_, faceindex, res_);
-                    int index3 = mesh_.addPoint(vertList[triTable[cubeindex][n+2]]* size_ + offset_, faceindex, res_);
-
-//                    int index1 = mesh_.addPoint(vertList[triTable[cubeindex][n]], faceindex);
-//                    int index2 = mesh_.addPoint(vertList[triTable[cubeindex][n+1]], faceindex);
-//                    int index3 = mesh_.addPoint(vertList[triTable[cubeindex][n+2]], faceindex);
+                    int index1 = mesh_.addPoint(vertList[triTable[cubeindex][n]] * size_ + offset_, faceindex);
+                    int index2 = mesh_.addPoint(vertList[triTable[cubeindex][n+1]]* size_ + offset_, faceindex);
+                    int index3 = mesh_.addPoint(vertList[triTable[cubeindex][n+2]]* size_ + offset_, faceindex);
 
                     // add the triangle index in the mesh.
                     mesh_.addFace(index1, index2, index3);

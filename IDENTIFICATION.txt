@@ -1,0 +1,7 @@
+name "Chenyang Nie"
+student_id "V00917530"
+email "sagatncy@gmail.com"
+term "2019-05"
+course "ECE595C"
+section "T01"
+assignment "cpp_project"

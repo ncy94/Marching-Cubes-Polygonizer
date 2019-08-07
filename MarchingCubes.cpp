@@ -3,7 +3,6 @@
 #include <algorithm>
 #include "MarchingCubes.hpp"
 
-
 std::vector<Point> MarchingCubes::generateSphere(int radius, int number) {
     std::vector<Point> res;
     int iter = number;

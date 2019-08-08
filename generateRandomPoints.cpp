@@ -25,7 +25,7 @@ std::vector<Point> generateRandomPoints(int number, int maxabsval) {
 }
 
 int main(int argc, char **argv){
-    int opt, n=1000 , m=1 ; //default value for number of points and max absolute value
+    int opt, n=10000 , m=1 ; //default value for number of points and max absolute value
 
     while((opt = getopt(argc, argv, "n:m:")) != -1){
         switch(opt)

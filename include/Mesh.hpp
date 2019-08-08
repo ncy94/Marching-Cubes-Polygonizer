@@ -13,7 +13,7 @@
 #include <array>
 #include <algorithm>
 #include <unordered_map>
-#include "../glm/glm/vec3.hpp"
+#include "../glm/vec3.hpp"
 
 using Point = glm::vec3;
 

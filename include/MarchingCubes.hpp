@@ -5,8 +5,8 @@
 #ifndef CPP_PROJECT_NCY94_MARCHINGCUBES_HPP
 #define CPP_PROJECT_NCY94_MARCHINGCUBES_HPP
 
-#include "../glm/glm/vec3.hpp"
-#include "../glm/glm/geometric.hpp"
+#include "../glm/vec3.hpp"
+#include "../glm/geometric.hpp"
 #include "Mesh.hpp"
 #include <vector>
 #include <iostream>

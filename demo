@@ -16,8 +16,8 @@ point_program="$cmd_dir/generate_random_point_cloud"
 echo "Running generate_random_point_cloud"
 $point_program -n 10 -m 1 || panic "generate point cloud failed"
 
-#echo "Running generate_mesh for bunny"
-#$mesh_program < $cmd_dir/bunny.xyz > $cmd_dir/bunny.off|| panic "generate mesh from bunny failed"
+echo "Running generate_mesh for bunny"
+$mesh_program < $cmd_dir/bunny.xyz > $cmd_dir/bunny.off|| panic "generate mesh from bunny failed"
 
-#echo "Running generate_mesh for test file"
-#$mesh_program < $cmd_dir/pointcloud.xyz > $cmd_dir/pointcloud.off || panic "generate mesh from point cloud failed"
+echo "Running generate_mesh for test file"
+$mesh_program < $cmd_dir/pointcloud.xyz > $cmd_dir/pointcloud.off || panic "generate mesh from point cloud failed"
